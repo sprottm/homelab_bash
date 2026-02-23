@@ -17,38 +17,38 @@
 function custom_log()
 {
   # Assign variables to inputs
-  local msg_level=${1,,}
-  local readonly msg=${@:2}
+  local msg_level="${1,,}"
+  local readonly msg="${@:2}"
   if [[ -n "${USER_LOG_LEVEL}" ]]; then
-    local readonly user_level=${USER_LOG_LEVEL,,}
+    local readonly user_level="${USER_LOG_LEVEL,,}"
   else
     local readonly user_level="info"
   fi
 
   # Make sure the logic of the function doesn't break if "color" is defined globally
-  unset color
+  local color=""
 
-  # For eqdh log level, determine if it is within the scope of the user log level
+  # For each log level, determine if it is within the scope of the user log level
   # If so, assign the label a color so that it will be displayed later
   case "${msg_level}" in
     debug)
-      [[ "${user_level}" =~ ^(debug)$ ]] && local readonly color=39
+      [[ "${user_level}" =~ ^(debug)$ ]] && color=39
     ;;
     info)
-      [[ "${user_level}" =~ ^(debug|info)$ ]] && local readonly color=46
+      [[ "${user_level}" =~ ^(debug|info)$ ]] && color=46
     ;;
     warn)
-      [[ "${user_level}" =~ ^(debug|info|warn)$ ]] && local readonly color=214
+      [[ "${user_level}" =~ ^(debug|info|warn)$ ]] && color=214
     ;;
     error)
-      [[ "${user_level}" =~ ^(debug|info|warn|error)$ ]] && local readonly color=196
+      [[ "${user_level}" =~ ^(debug|info|warn|error)$ ]] && color=196
     ;;
     fatal)
-      [[ "${user_level}" =~ ^(debug|info|warn|error|fatal)$ ]] && local readonly color=196
+      [[ "${user_level}" =~ ^(debug|info|warn|error|fatal)$ ]] && color=196
     ;;
     * )
       custom_log "WARN" "${msg_level} is not a valid log level!"
-      local readonly color=240
+      color=240
     ;;
     esac
 
@@ -73,20 +73,20 @@ function custom_log()
 # Usage:
 #
 #   local readonly required_variables=( var1 var2 ... )
-#   check_required_variables ${required_variables[@]}
+#   check_required_variables "${required_variables[@]}"
 #   local return_code=$?
-#   if [[ ${return_code} -ne 2 ]]; then
-#     custom_log 1 "Required variables are not set!"
-#     exit ${return_code}
+#   if [[ "${return_code}" -ne 0 ]]; then
+#     custom_log fatal "Required variables are not set!"
+#     exit "${return_code}"
 #   fi
 #
 function check_required_variables()
 {
   # For each variable that is required, check if it is defined
-  local readonly vars=${@}
+  local readonly vars=("$@")
   local return_code=0
-  for var in ${vars[@]}; do
-    if declare -p ${var} &>/dev/null; then
+  for var in "${vars[@]}"; do
+    if [[ -v "${var}" ]]; then
       custom_log "debug" "${var} is set!"
     else
       custom_log "error" "${var} is not set and is required!"
@@ -95,7 +95,7 @@ function check_required_variables()
   done
 
   # Tells the sourcing script how many errors were encountered
-  return ${return_code}
+  return "${return_code}"
 }
 
 # Sources in script dependencies
@@ -108,28 +108,27 @@ function check_required_variables()
 # Usage:
 #
 #   local readonly script_dependencies=( /tmp/dep1 /tmp/dep2 )
-#   source_dependencies ${script_dependencies[@]}
+#   source_dependencies "${script_dependencies[@]}"
 #   local return_code=$?
-#   if [[ ${return_code} =~ ^[6-7]$ ]]; then
-#     custom_log 1 "Dependencies could not be sourced in"
+#   if [[ "${return_code}" -ne 0 ]]; then
+#     custom_log fatal "Dependencies could not be sourced in"
 #     exit ${return_code}
 #   fi
 #
 function source_dependencies()
 {
-  local readonly dependencies=${@}
+  local readonly dependencies=("$@")
   local return_code=0
-  for dependency in ${dependencies[@]}; do
+  for dependency in "${dependencies[@]}"; do
     # For each dependency, first ensure if it is readable
-    if [[ ! -r ${dependency} ]]; then
+    if [[ ! -r "${dependency}" ]]; then
       custom_log "error" "Unable to source ${dependency}; ${dependency} not readable"
-      local return_code=$(( ${return_code} + 1 ))
+      (( return_code++ ))
       continue
     fi
     custom_log "debug" "Able to read ${dependency}"
     # If the script dependency is readable, try sourcing it in
-    source ${dependency}
-    if [[ $? -eq 0 ]]; then
+    if source "${dependency}"; then
       custom_log "debug" "Successfuly sourced in ${dependency}"
     else
       custom_log "error" "Unable to source in ${dependency}"
@@ -138,6 +137,6 @@ function source_dependencies()
   done
 
   # Tells the sourcing script how many errors were encountered
-  return ${return_code}
+  return "${return_code}"
 }
 
