@@ -80,7 +80,7 @@ function format_partitions()
   # Set the variables for the script to use
   local -r primary_drive_raw="${1}"
   local -r volume_group="${2}"
-  if [[ "${primary_drive##*/}" =~ ^nvme ]]; then
+  if [[ "${primary_drive_raw##*/}" =~ ^nvme ]]; then
     local primary_drive="${primary_drive_raw}p"
   else
     local primary_drive="${primary_drive_raw}"
