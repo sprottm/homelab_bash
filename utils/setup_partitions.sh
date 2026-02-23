@@ -15,9 +15,9 @@ function is_block_device()
 
   # Ensure primary_drive is a block device
   if [[  -b "${block_device}" ]]; then
-    custom_log "debug" "${primary_drive} is a valid block device"
+    custom_log "debug" "${block_device} is a valid block device"
   else
-    custom_log "error" "${primary_drive} is not a valid block device" 
+    custom_log "error" "${block_device} is not a valid block device" 
     return 1
   fi
 }
