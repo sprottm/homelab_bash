@@ -99,7 +99,16 @@ function format_partitions()
     return 1
   fi
 
+  # Format the physical volume
+  # TODO: Improve the pvdisplay/vgdisplay greps
+  custom_log "info" "Formatting the physical volume ${primary_drive}3"
   pvcreate "${primary_drive}3"
+  if pvdisplay | grep -q "${primary_drive}3"; then
+    custom_log "info" "Successfully formatted physical volume ${primary_drive}3"
+  else
+    custom_log "error" "Failed to format physical volume ${primary_drive}3"
+    return 1
+  fi
 
   # Create the volume group and ensure it was created
   custom_log "info" "Creating the volume group ${volume_group}"
@@ -113,6 +122,7 @@ function format_partitions()
 
   # Create logical volumes and ensure they were created
   # This is minimal, logical volumes can be extended later
+  # TODO: Handle all of the logical volumes with a loop and an array
   lvcreate -L 20G -n lv_root "${volume_group}"
   is_block_device /dev/"${volume_group}"/lv_root || return 1
   lvcreate -L 20G -n lv_home "${volume_group}"
