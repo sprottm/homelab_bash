@@ -43,9 +43,6 @@ function custom_log()
     error)
       [[ "${user_level}" =~ ^(debug|info|warn|error)$ ]] && color=196
     ;;
-    fatal)
-      [[ "${user_level}" =~ ^(debug|info|warn|error|fatal)$ ]] && color=196
-    ;;
     * )
       custom_log "WARN" "${msg_level} is not a valid log level!"
       color=240
@@ -76,7 +73,7 @@ function custom_log()
 #   check_required_variables "${required_variables[@]}"
 #   local return_code=$?
 #   if [[ "${return_code}" -ne 0 ]]; then
-#     custom_log fatal "Required variables are not set!"
+#     custom_log "error" "Required variables are not set!"
 #     exit "${return_code}"
 #   fi
 #
@@ -111,7 +108,7 @@ function check_required_variables()
 #   source_dependencies "${script_dependencies[@]}"
 #   local return_code=$?
 #   if [[ "${return_code}" -ne 0 ]]; then
-#     custom_log fatal "Dependencies could not be sourced in"
+#     custom_log "error" "Dependencies could not be sourced in"
 #     exit ${return_code}
 #   fi
 #
