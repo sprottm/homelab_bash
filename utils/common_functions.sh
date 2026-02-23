@@ -18,11 +18,11 @@ function custom_log()
 {
   # Assign variables to inputs
   local msg_level="${1,,}"
-  local readonly msg="${@:2}"
+  local -r msg="${@:2}"
   if [[ -n "${USER_LOG_LEVEL}" ]]; then
-    local readonly user_level="${USER_LOG_LEVEL,,}"
+    local -r user_level="${USER_LOG_LEVEL,,}"
   else
-    local readonly user_level="info"
+    local -r user_level="info"
   fi
 
   # Make sure the logic of the function doesn't break if "color" is defined globally
@@ -56,8 +56,8 @@ function custom_log()
   [[ -z "${color}" ]] && return 0
 
   # Colorize the log level font based on what was defined above
-  local readonly colored="\033[38;5;${color};1m"
-  local readonly default="\033[0m"
+  local -r colored="\033[38;5;${color};1m"
+  local -r default="\033[0m"
 
   # Display the log
   printf "%s [${colored}%s${default}] %s\n" "$( date +"%d %b %H:%M" )" "${msg_level^^}" "${msg}"
@@ -72,7 +72,7 @@ function custom_log()
 #   * An error message if required variables are not set
 # Usage:
 #
-#   local readonly required_variables=( var1 var2 ... )
+#   local -r required_variables=( var1 var2 ... )
 #   check_required_variables "${required_variables[@]}"
 #   local return_code=$?
 #   if [[ "${return_code}" -ne 0 ]]; then
@@ -83,7 +83,7 @@ function custom_log()
 function check_required_variables()
 {
   # For each variable that is required, check if it is defined
-  local readonly vars=("$@")
+  local -r vars=("$@")
   local return_code=0
   for var in "${vars[@]}"; do
     if [[ -v "${var}" ]]; then
@@ -107,7 +107,7 @@ function check_required_variables()
 #   * Sources in dependencies or returns an error if dependencies cannot be sourced in
 # Usage:
 #
-#   local readonly script_dependencies=( /tmp/dep1 /tmp/dep2 )
+#   local -r script_dependencies=( /tmp/dep1 /tmp/dep2 )
 #   source_dependencies "${script_dependencies[@]}"
 #   local return_code=$?
 #   if [[ "${return_code}" -ne 0 ]]; then
@@ -117,7 +117,7 @@ function check_required_variables()
 #
 function source_dependencies()
 {
-  local readonly dependencies=("$@")
+  local -r dependencies=("$@")
   local return_code=0
   for dependency in "${dependencies[@]}"; do
     # For each dependency, first ensure if it is readable
