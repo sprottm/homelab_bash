@@ -42,7 +42,7 @@ function create_partitions()
     custom_log "info" "Successfully wiped ${primary_drive}"
   else
     custom_log "error" "Failed to wipe ${primary_drive}"
-    return "${return_code}"
+    return 1
   fi
 
   # Create the new partitions
@@ -88,10 +88,6 @@ function format_partitions()
 
   # Ensure primary_drive is a block device
   is_block_device "${primary_drive}" || return 1
-
-  # Format new partitions
-  custom_log "info" "Formatting partitions..."
-  mkfs.vfat -F 32 -I -n "efi" "${primary_drive}1"
 
   # Format and activate swap partition
   custom_log "info" "Formatting the swap partition"
