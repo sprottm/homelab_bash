@@ -90,7 +90,7 @@ function check_required_variables()
       custom_log "debug" "${var} is set!"
     else
       custom_log "error" "${var} is not set and is required!"
-      local return_code=$(( ${return_code} + 1 ))
+      (( return_code++ ))
     fi
   done
 
@@ -128,12 +128,12 @@ function source_dependencies()
     fi
     custom_log "debug" "Able to read ${dependency}"
     # If the script dependency is readable, try sourcing it in
-    source ${script_dependency}
+    source ${dependency}
     if [[ $? -eq 0 ]]; then
       custom_log "debug" "Successfuly sourced in ${dependency}"
     else
       custom_log "error" "Unable to source in ${dependency}"
-      local return_code=$(( ${return_code} + 1 ))
+      (( return_code++ ))
     fi
   done
 
