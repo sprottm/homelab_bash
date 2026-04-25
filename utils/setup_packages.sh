@@ -34,6 +34,8 @@ function install_packages()
 
 function postinstall()
 {
+  local -r volume_group="${1}"
+
   arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
   arch-chroot /mnt hwclock --systohc
 
@@ -53,7 +55,7 @@ function postinstall()
   printf "%-12s %-9s\n" "console-mode" "max" >> ${loader_config}
 
   local readonly arch_boot_entry=/mnt/boot/loader/entries/arch.conf
-  local readonly root_vol_path=/dev/mapper/vgroot-lv_root
+  local readonly root_vol_path="/dev/mapper/${volume_group}-lv_root"
   printf "%-8s %-30s\n" "title" "Arch Linux" > ${arch_boot_entry}
   printf "%-8s %-30s\n" "linux" "/vmlinuz-linux" >> ${arch_boot_entry}
   printf "%-8s %-30s\n" "initrd" "/amd-ucode.img" >> ${arch_boot_entry}

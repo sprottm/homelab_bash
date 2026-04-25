@@ -83,5 +83,5 @@ create_partitions "${PRIMARY_DRIVE}"
 format_partitions "${PRIMARY_DRIVE}" "${VOLUME_GROUP}"
 set_mirrors
 install_packages
-postinstall
+postinstall "${VOLUME_GROUP}"
 
