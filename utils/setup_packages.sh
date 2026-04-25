@@ -3,7 +3,7 @@
 function set_mirrors()
 {
   local readonly mirrorlist=/etc/pacman.d/mirrorlist
-  echo 'Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch' > ${mirrorlist}
+  echo 'Server = https://mirror.arizona.edu/archlinux/$repo/os/$arch' > ${mirrorlist}
   echo 'Server = https://mirrors.mit.edu/archlinux/$repo/os/$arch' >> ${mirrorlist}
   echo 'Server = https://mirrors.ocf.berkeley.edu/archlinux/$repo/os/$arch' >> ${mirrorlist}
 }
@@ -11,7 +11,7 @@ function set_mirrors()
 function install_packages()
 {
   # Install base packages
-  pacstrap -K /mnt base linux linux-firmware
+  pacstrap -K /mnt base linux linux-firmware amd-ucode
 
   # Install filesystem packages
   pacstrap -K /mnt xfsprogs lvm2
@@ -25,8 +25,8 @@ function install_packages()
   # Install audio server and drivers
   pacstrap -K /mnt sof-firmware pipewire wireplumber pipewire-pulse pipewire-alsa pavucontrol alsa-ucm-conf alsa-utils 
 
-  # Install display manager and, display environment
-  pacstrap -K /mnt xfce4 lightdm
+  # Install display manager and display environment
+  pacstrap -K /mnt xfce4 lightdm lightdm-slick-greeter
 
   # Configure the system for post-install configuration
   pacstrap -K /mnt ansible openssh vim sudo
@@ -37,9 +37,10 @@ function postinstall()
   arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
   arch-chroot /mnt hwclock --systohc
 
-  sed -ie 's/#LANG=en_US.UTF-8/LANG=en_US.UTF-8/g' /etc/locale.conf
   arch-chroot /mnt locale-gen
-  #echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+  echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+
+  echo 'KEYMAP=us' > /mnt/etc/vconsole.conf
 
   echo "blacktower" > /mnt/etc/hostname
 
@@ -52,7 +53,7 @@ function postinstall()
   printf "%-12s %-9s\n" "console-mode" "max" >> ${loader_config}
 
   local readonly arch_boot_entry=/mnt/boot/loader/entries/arch.conf
-  local readonly root_vol_path=/dev/mapper/vg_root-lv_root
+  local readonly root_vol_path=/dev/mapper/vgroot-lv_root
   printf "%-8s %-30s\n" "title" "Arch Linux" > ${arch_boot_entry}
   printf "%-8s %-30s\n" "linux" "/vmlinuz-linux" >> ${arch_boot_entry}
   printf "%-8s %-30s\n" "initrd" "/amd-ucode.img" >> ${arch_boot_entry}
@@ -60,7 +61,7 @@ function postinstall()
   printf "%-8s %-30s\n" "options" "root=${root_vol_path} rw" >> ${arch_boot_entry}
 
   # Insert lvm2 into hooks before filesystems and regenerate initramfs
-  sed -i '/^HOOKS=/s/lvm2 //g' filename.txt
+  sed -i '/^HOOKS=/s/lvm2 //g' /mnt/etc/mkinitcpio.conf
   sed -ie 's/filesystems/lvm2 filesystems/g' /mnt/etc/mkinitcpio.conf
   arch-chroot /mnt mkinitcpio -p linux
 
@@ -68,7 +69,7 @@ function postinstall()
 
   arch-chroot /mnt systemctl enable NetworkManager.service \
                                     sshd.service \
-                                    lightdmm.service \
+                                    lightdm.service \
                                     lvm2-monitor.service
 
   arch-chroot /mnt systemctl --global enable wireplumber.service \

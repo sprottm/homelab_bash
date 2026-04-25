@@ -87,7 +87,7 @@ function format_partitions()
   fi
 
   # Ensure primary_drive is a block device
-  is_block_device "${primary_drive}" || return 1
+  is_block_device "${primary_drive_raw}" || return 1
 
   # Format and activate swap partition
   custom_log "info" "Formatting the swap partition"

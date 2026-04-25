@@ -13,13 +13,21 @@
 function source_dependencies()
 {
   # Source in utility script, fail if it can't be sourced
-  local readonly script_directory=$( dirname ${0} )
-  local readonly script_utils_directory=${script_directory}/utils
+  local -r script_directory=$( dirname ${0} )
+  local -r script_utils_directory=${script_directory}/utils
   source ${script_utils_directory}/common_functions.sh
   local exit_code=${?}
   if [[ ${exit_code} -ne 0 ]]; then
     echo "[FATAL] Unable to source in common_functions.sh"
-    exit 1
+    exit ${exit_code}
+  fi
+
+  local -r script_dependencies=( utils/setup_partitions.sh utils/setup_packages.sh )
+  source_dependencies "${script_dependencies[@]}"
+  local exit_code=${?}
+  if [[ "${exit_code}" -ne 0 ]]; then
+    custom_log "error" "Dependencies could not be sourced in"
+    exit ${exit_code}
   fi
 }
 
