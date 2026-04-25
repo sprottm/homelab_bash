@@ -25,8 +25,8 @@ function install_packages()
   # Install audio server and drivers
   pacstrap -K /mnt sof-firmware pipewire wireplumber pipewire-pulse pipewire-alsa pavucontrol alsa-ucm-conf alsa-utils 
 
-  # Install display server, display environment, and audio drivers
-  pacstrap -K /mnt gnome gnome-shell-extensions gdm
+  # Install display manager and, display environment
+  pacstrap -K /mnt xfce4 lightdm
 
   # Configure the system for post-install configuration
   pacstrap -K /mnt ansible openssh vim sudo
@@ -37,9 +37,9 @@ function postinstall()
   arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
   arch-chroot /mnt hwclock --systohc
 
-  #TODO uncomment line from /etc/locale.gen first
+  sed -ie 's/#LANG=en_US.UTF-8/LANG=en_US.UTF-8/g' /etc/locale.conf
   arch-chroot /mnt locale-gen
-  echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+  #echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
 
   echo "blacktower" > /mnt/etc/hostname
 
@@ -60,19 +60,20 @@ function postinstall()
   printf "%-8s %-30s\n" "options" "root=${root_vol_path} rw" >> ${arch_boot_entry}
 
   # Insert lvm2 into hooks before filesystems and regenerate initramfs
-  # TODO remove lvm2 from all hooks first
-  sed -ie 's/filesystems/lvm2 filesystems/g'  /mnt/etc/mkinitcpio.conf
+  sed -i '/^HOOKS=/s/lvm2 //g' filename.txt
+  sed -ie 's/filesystems/lvm2 filesystems/g' /mnt/etc/mkinitcpio.conf
   arch-chroot /mnt mkinitcpio -p linux
 
-  arch-chroot /mnt useradd -m -u 1000 -c "John Doe" -g wheel johndoe
+  arch-chroot /mnt useradd -m -u 1000 -c "Mike" -g wheel mike
 
-  arch-chroot /mnt systemctl enable NetworkManager.service
-  arch-chroot /mnt systemctl enable sshd.service
-  arch-chroot /mnt systemctl enable gdm.service
-  arch-chroot /mnt systemctl enable lvm2-monitor.service
-  arch-chroot /mnt systemctl --global enable wireplumber.service
-  arch-chroot /mnt systemctl --global enable pipewire.service
-  arch-chroot /mnt systemctl --global enable pipewire-pulse.service
+  arch-chroot /mnt systemctl enable NetworkManager.service \
+                                    sshd.service \
+                                    lightdmm.service \
+                                    lvm2-monitor.service
+
+  arch-chroot /mnt systemctl --global enable wireplumber.service \
+                                             pipewire.service \
+                                             pipewire-pulse.service
 
   echo "DON'T FORGET TO SET USER PASSWORD!!!"
 }
