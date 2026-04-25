@@ -54,13 +54,31 @@ function define_variables()
   fi
 }
 
+# Ensure that the network is active, as it is required for downloading packages
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   None
+function test_network()
+{
+  if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
+    custom_log "debug" "Internet is reachable"
+  else
+    custom_log "error" "Internet not reachable"
+    exit 1
+  fi
+}
+
 if [[ "${EUID}" -ne 0 ]]; then
-  echo "Error: This function must be run as root." 
+  echo "error" "This function must be run as root." 
   exit 1
 fi
 
 source_dependencies
 define_variables ${*}
+test_network
 create_partitions "${PRIMARY_DRIVE}"
 format_partitions "${PRIMARY_DRIVE}" "${VOLUME_GROUP}"
 set_mirrors
