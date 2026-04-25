@@ -2,26 +2,6 @@
 #
 # From a liveinstall, create and format partitions, then mount them
 
-# Ensures device is a block device
-# Globals:
-#   None
-# Arguments:
-#   block_device
-# Outputs:
-#   None
-function is_block_device()
-{
-  local -r block_device="${1}"
-
-  # Ensure primary_drive is a block device
-  if [[  -b "${block_device}" ]]; then
-    custom_log "debug" "${block_device} is a valid block device"
-  else
-    custom_log "error" "${block_device} is not a valid block device" 
-    return 1
-  fi
-}
-
 # Wipe the partitions on my drive and create new ones
 # Globals:
 #   None
