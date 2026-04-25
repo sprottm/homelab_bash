@@ -65,7 +65,10 @@ function postinstall()
   sed -ie 's/filesystems/lvm2 filesystems/g' /mnt/etc/mkinitcpio.conf
   arch-chroot /mnt mkinitcpio -p linux
 
+  # Setup user account and their permissions
   arch-chroot /mnt useradd -m -u 1000 -c "Mike" -g wheel mike
+  arch-chroot /mnt passwd mike
+  echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' > /mnt/etc/sudoers.d/admin
 
   arch-chroot /mnt systemctl enable NetworkManager.service \
                                     sshd.service \
@@ -75,7 +78,5 @@ function postinstall()
   arch-chroot /mnt systemctl --global enable wireplumber.service \
                                              pipewire.service \
                                              pipewire-pulse.service
-
-  echo "DON'T FORGET TO SET USER PASSWORD!!!"
 }
 
