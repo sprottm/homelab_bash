@@ -36,24 +36,27 @@ function postinstall()
 {
   local -r volume_group="${1}"
 
+  # Configure localization
   arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
   arch-chroot /mnt hwclock --systohc
-
+  sed -ie 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /mnt/etc/locale.gen
   arch-chroot /mnt locale-gen
   echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
-
   echo 'KEYMAP=us' > /mnt/etc/vconsole.conf
 
+  # Set my hostname
   echo "blacktower" > /mnt/etc/hostname
 
   # Use systemd-boot as the bootloader
   bootctl --path=/mnt/boot install
 
+  # Configure the bootloader
   local readonly loader_config=/mnt/boot/loader/loader.conf
   printf "%-12s %-9s\n" "default" "arch.conf" > ${loader_config}
   printf "%-12s %-9s\n" "timeout" "3" >> ${loader_config}
   printf "%-12s %-9s\n" "console-mode" "max" >> ${loader_config}
 
+  # Create our bootloader option
   local readonly arch_boot_entry=/mnt/boot/loader/entries/arch.conf
   local readonly root_vol_path="/dev/mapper/${volume_group}-lv_root"
   printf "%-8s %-30s\n" "title" "Arch Linux" > ${arch_boot_entry}
@@ -72,6 +75,15 @@ function postinstall()
   arch-chroot /mnt passwd mike
   echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' > /mnt/etc/sudoers.d/admin
 
+  # Configure the slick greeter for lightdm
+  echo '[Greeter]' > /mnt/etc/lightdm/slick-greeter.conf
+  echo 'enable-hidpi=on' >> /mnt/etc/lightdm/slick-greeter.conf
+  echo 'background=/usr/share/backgrounds/xfce/custom.png' >> /mnt/etc/lightdm/slick-greeter.conf
+
+  # Make sure SSH service will launch
+  arch-chroot /mnt ssh-keygen -A
+
+  # Ensure my core services are enabled
   arch-chroot /mnt systemctl enable NetworkManager.service \
                                     sshd.service \
                                     lightdm.service \
@@ -81,4 +93,3 @@ function postinstall()
                                              pipewire.service \
                                              pipewire-pulse.service
 }
-
