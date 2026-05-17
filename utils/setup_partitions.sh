@@ -93,7 +93,7 @@ function format_partitions()
 
   # Create the volume group and ensure it was created
   custom_log "info" "Creating the volume group ${volume_group}"
-  vgcreate "${volume_group}" "${primary_drive}3" 
+  vgcreate "${volume_group}" "${primary_drive}3"
   if vgdisplay | grep -q "${volume_group}"; then
     custom_log "info" "Successfully created volume group ${volume_group}"
   else

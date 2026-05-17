@@ -23,7 +23,7 @@ function install_packages()
   pacstrap -K /mnt wpa_supplicant networkmanager
 
   # Install audio server and drivers
-  pacstrap -K /mnt sof-firmware pipewire wireplumber pipewire-pulse pipewire-alsa pavucontrol alsa-ucm-conf alsa-utils 
+  pacstrap -K /mnt sof-firmware pipewire wireplumber pipewire-pulse pipewire-alsa pavucontrol alsa-ucm-conf alsa-utils
 
   # Install display manager and display environment
   pacstrap -K /mnt xfce4 lightdm lightdm-slick-greeter

@@ -95,7 +95,7 @@ function define_variables()
       ;;
     esac
     shift
-  done 
+  done
 
   [[ -z "${VOLUME_GROUP}" ]] && VOLUME_GROUP="vgroot"
 
