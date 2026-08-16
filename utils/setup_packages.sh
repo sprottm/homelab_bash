@@ -11,7 +11,7 @@ function set_mirrors()
 function install_packages()
 {
   # Install base packages
-  pacstrap -K /mnt base linux linux-firmware amd-ucode
+  pacstrap -K /mnt base linux-hardened linux-firmware amd-ucode
 
   # Install filesystem packages
   pacstrap -K /mnt xfsprogs lvm2
@@ -60,15 +60,15 @@ function postinstall()
   local readonly arch_boot_entry=/mnt/boot/loader/entries/arch.conf
   local readonly root_vol_path="/dev/mapper/${volume_group}-lv_root"
   printf "%-8s %-30s\n" "title" "Arch Linux" > ${arch_boot_entry}
-  printf "%-8s %-30s\n" "linux" "/vmlinuz-linux" >> ${arch_boot_entry}
+  printf "%-8s %-30s\n" "linux" "/vmlinuz-linux-hardened" >> ${arch_boot_entry}
   printf "%-8s %-30s\n" "initrd" "/amd-ucode.img" >> ${arch_boot_entry}
-  printf "%-8s %-30s\n" "initrd" "/initramfs-linux.img" >> ${arch_boot_entry}
+  printf "%-8s %-30s\n" "initrd" "/initramfs-linux-hardened.img" >> ${arch_boot_entry}
   printf "%-8s %-30s\n" "options" "root=${root_vol_path} rw" >> ${arch_boot_entry}
 
   # Insert lvm2 into hooks before filesystems and regenerate initramfs
   sed -i '/^HOOKS=/s/lvm2 //g' /mnt/etc/mkinitcpio.conf
   sed -ie 's/filesystems/lvm2 filesystems/g' /mnt/etc/mkinitcpio.conf
-  arch-chroot /mnt mkinitcpio -p linux
+  arch-chroot /mnt mkinitcpio -p linux-hardened
 
   # Setup user account and their permissions
   arch-chroot /mnt useradd -m -u 1000 -c "Mike" -g wheel mike
