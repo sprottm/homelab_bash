@@ -113,7 +113,7 @@ source_dependencies
 define_variables ${*} || exit 1
 is_network_up || exit 1
 is_root || exit 1
-is_block_device || exit 1
+is_block_device "${PRIMARY_DRIVE}" || exit 1
 create_partitions "${PRIMARY_DRIVE}"
 format_partitions "${PRIMARY_DRIVE}" "${VOLUME_GROUP}"
 set_mirrors
