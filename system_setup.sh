@@ -12,18 +12,17 @@
 #   None
 function display_usage()
 {
-  echo "Usage: ${0} [OPTIONS]"
-    echo ''
+  printf "Usage: ${0} [OPTIONS]\n"
+  printf "\n"
+  local -r format="  %-3s  %-5s  %-6s  %-18s  %s\n"
 
-    local FORMAT="  %-3s  %-6s  %-18s  %-5s  %s\n"
+  printf "\033[1m${format}\033[0m" "Req" "Input" "Short" "Long" "Description"
+  printf "\n"
 
-    printf "\033[1m${FORMAT}\033[0m" "Req" "Short" "Long" "Input" "Description"
-    echo ''
-
-    printf "${FORMAT}" "*" "-d" "--drive" "Yes" "Define drive to install Arch Linux onto (i.e. /dev/sda)"
-    printf "${FORMAT}" "" "-g" "--volume-group" "Yes" "Define name of volume group (default = vgroot)"
-    printf "${FORMAT}" "" "" "--log-level" "Yes" "Define log level for messages (default = info)"
-    printf "${FORMAT}" "" "-h" "--help" "No" "Display usage and exit"
+  printf "${format}" "*" "*" "-d" "--drive" "Define drive to install Arch Linux onto (i.e. /dev/sda)"
+  printf "${format}" " " "*" "-g" "--volume-group" "Define name of volume group (default = vgroot)"
+  printf "${format}" " " "*" "" "--log-level" "Define log level for messages (default = info)"
+  printf "${format}" " " " " "-h" "--help" "Display usage and exit"
 }
 
 # Source in the common functions before running the script
