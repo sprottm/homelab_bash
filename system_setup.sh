@@ -3,7 +3,7 @@
 # Used for setting up my Arch Linux system from the liveinstall
 # Not using Archinstall because I want more customizability
 
-# Display script usage and exit
+# Display script usage
 # Globals:
 #   None
 # Arguments:
